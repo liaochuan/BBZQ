@@ -142,11 +142,9 @@ class MineProfileHook(env: RoamingEnv) : BaseRoamingHook(env) {
                 saveKnownComponents(titles)
             }
 
-            runCatching {
-                items.clear()
-                items.addAll(kept)
-            }
-            param.result = items
+            // 不可原地改動宿主列表：「我的」頁 Compose 正在 UI 線程遍歷它（雙開時更易併發），
+            // 原地 clear/addAll 會觸發 ConcurrentModificationException，改回傳獨立副本 (#134)
+            param.result = kept
         }
     }
 
